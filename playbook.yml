@@ -11,6 +11,13 @@
       - iterm2
       - slack
       - visual-studio-code
+    vs_exts:
+      - ms-dotnettools.csharp
+      - fakesharper.fakesharper
+      - ms-azuretools.vscode-docker
+    git_config:
+      - pull.ff only
+      - pull.rebase false
 
   tasks:
     - name: Install apps with brew
@@ -24,3 +31,17 @@
         name: "{{ item }}"
         state: absent
       loop: "{{ casks }}"
+
+    - name: Add code to path
+      shell: |
+        cat << EOF >> ~/.zshrc
+        export PATH="\$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+        EOF
+
+    - name: Install visual studio code extensions
+      shell: code --install-extension {{ item }}
+      loop: "{{ vs_exts }}"
+
+    - name: Git config
+      shell: git config --global {{ item }}
+      loop: "{{ git_config }}"
