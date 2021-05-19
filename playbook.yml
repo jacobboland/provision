@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  vars:
+    applications:
+      - docker
+      - docker-compose
+      - git
+    casks:
+      - firefox
+      - google-chrome
+      - iterm2
+      - slack
+      - visual-studio-code
+
+  tasks:
+    - name: Install apps with brew
+      homebrew:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ applications }}"
+
+    - name: Install apps with brew (casks)
+      homebrew_cask:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ casks }}"
