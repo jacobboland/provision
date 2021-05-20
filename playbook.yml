@@ -6,6 +6,7 @@
       - docker-compose
       - git
     casks:
+      - dotnet-sdk
       - firefox
       - google-chrome
       - iterm2
@@ -15,22 +16,28 @@
       - ms-dotnettools.csharp
       - fakesharper.fakesharper
       - ms-azuretools.vscode-docker
+      - k--kato.intellij-idea-keybindings
+      - fernandoescolar.vscode-solution-explorer
     git_config:
       - pull.ff only
       - pull.rebase false
+      - core.autocrlf input
 
   tasks:
+    - name: Update homebrew
+      homebrew:
+        update_homebrew: yes
+
     - name: Install apps with brew
       homebrew:
-        name: "{{ item }}"
-        state: absent
-      loop: "{{ applications }}"
+        name: "{{ applications }}"
+        state: present
 
     - name: Install apps with brew (casks)
       homebrew_cask:
-        name: "{{ item }}"
-        state: absent
-      loop: "{{ casks }}"
+        name: "{{ casks }}"
+        state: present
+        accept_external_apps: true
 
     - name: Add code to path
       shell: |
