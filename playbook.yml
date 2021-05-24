@@ -1,16 +1,23 @@
 ---
 - hosts: localhost
   vars:
+    tap:
+      - aws/tap
+      - homebrew/cask
     applications:
+      - awscli
+      - aws-sam-cli
       - docker
       - docker-compose
       - git
     casks:
       - dotnet-sdk
       - firefox
+      - gimp
       - google-chrome
       - iterm2
       - slack
+      - spectacle
       - visual-studio-code
     vs_exts:
       - ms-dotnettools.csharp
@@ -18,6 +25,9 @@
       - ms-azuretools.vscode-docker
       - k--kato.intellij-idea-keybindings
       - fernandoescolar.vscode-solution-explorer
+    dotnet_tools:
+      - dotnet-aspnet-codegenerator
+      - jetbrains.resharper.globaltools
     git_config:
       - pull.ff only
       - pull.rebase false
@@ -27,6 +37,11 @@
     - name: Update homebrew
       homebrew:
         update_homebrew: yes
+
+    - name: Tap homebrew repos
+      homebrew_tap:
+        name: "{{ tap }}"
+        state: present
 
     - name: Install apps with brew
       homebrew:
@@ -48,6 +63,16 @@
     - name: Install visual studio code extensions
       shell: code --install-extension {{ item }}
       loop: "{{ vs_exts }}"
+
+    - name: Check for already installed dotnet tools
+      shell: dotnet tool list -g | grep -ow -m1 {{ item }} | head -n 1
+      loop: "{{ dotnet_tools }}"
+      register: already_installed_dotnet_tools
+
+    - name: Install dotnet tools
+      shell: dotnet tool install --global {{ item }}
+      loop: "{{ dotnet_tools }}"
+      when: item not in already_installed_dotnet_tools.results|map(attribute='stdout')
 
     - name: Git config
       shell: git config --global {{ item }}
