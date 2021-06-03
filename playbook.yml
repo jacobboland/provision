@@ -4,12 +4,15 @@
     tap:
       - aws/tap
       - homebrew/cask
+      - homebrew/cask-versions
     applications:
       - awscli
       - aws-sam-cli
       - docker
       - docker-compose
       - git
+      - java
+      - node
     casks:
       - dotnet-sdk
       - firefox
@@ -19,6 +22,7 @@
       - slack
       - spectacle
       - visual-studio-code
+      - wireshark
     vs_exts:
       - ms-dotnettools.csharp
       - fakesharper.fakesharper
