@@ -19,6 +19,7 @@
       - gimp
       - google-chrome
       - iterm2
+      - p4v
       - slack
       - spectacle
       - visual-studio-code
@@ -36,6 +37,12 @@
       - pull.ff only
       - pull.rebase false
       - core.autocrlf input
+      - diff.tool p4mergetool
+      - difftool.p4mergetool.cmd '/Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"'
+      - merge.tool p4mergetool
+      - mergetool.p4mergetool.cmd '/Applications/p4merge.app/Contents/Resources/launchp4merge "$MERGED" "$LOCAL" "$BASE" "$REMOTE"'
+      - mergetool.p4mergetool.trustExitCode true
+      - mergetool.keepBackup false
 
   tasks:
     - name: Update homebrew
