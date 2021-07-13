@@ -25,14 +25,19 @@
       - visual-studio-code
       - wireshark
     vs_exts:
-      - ms-dotnettools.csharp
+      - brainfit.vscode-coverage-highlighter
       - fakesharper.fakesharper
-      - ms-azuretools.vscode-docker
-      - k--kato.intellij-idea-keybindings
       - fernandoescolar.vscode-solution-explorer
+      - k--kato.intellij-idea-keybindings
+      - ms-azuretools.vscode-docker
+      - ms-dotnettools.csharp
     dotnet_tools:
       - dotnet-aspnet-codegenerator
+      - dotnet-reportgenerator-globaltool
       - jetbrains.resharper.globaltools
+    paths:
+      - /Applications/Visual Studio Code.app/Contents/Resources/app/bin
+      - $HOME/.dotnet/tools
     git_config:
       - pull.ff only
       - pull.rebase false
@@ -65,25 +70,31 @@
         state: present
         accept_external_apps: true
 
-    - name: Add code to path
-      shell: |
-        cat << EOF >> ~/.zshrc
-        export PATH="\$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-        EOF
-
-    - name: Install visual studio code extensions
-      shell: code --install-extension {{ item }}
-      loop: "{{ vs_exts }}"
-
     - name: Check for already installed dotnet tools
       shell: dotnet tool list -g | grep -ow -m1 {{ item }} | head -n 1
       loop: "{{ dotnet_tools }}"
       register: already_installed_dotnet_tools
 
     - name: Install dotnet tools
-      shell: dotnet tool install --global {{ item }}
+      shell: dotnet tool install --global --tool-path ~/bin {{ item }}
       loop: "{{ dotnet_tools }}"
       when: item not in already_installed_dotnet_tools.results|map(attribute='stdout')
+
+    - name: read the zshrc file
+      shell: cat ~/.zshrc
+      register: existing_paths
+
+    - name: Add paths
+      shell: |
+        cat << EOF >> ~/.zshrc
+        export PATH="{{ item }}:$PATH"
+        EOF
+      loop: "{{ paths }}"
+      when: existing_paths.stdout.find(item) == -1
+
+    - name: Install visual studio code extensions
+      shell: code --install-extension {{ item }}
+      loop: "{{ vs_exts }}"
 
     - name: Git config
       shell: git config --global {{ item }}
